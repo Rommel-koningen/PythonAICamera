@@ -1,0 +1,5 @@
+opencv-python-headless==4.8.1.78
+torch==2.5.1
+torchvision==0.20.1
+ultralytics==8.3.49
+urllib3==2.2.1
