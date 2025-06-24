@@ -7,12 +7,9 @@ import requests
 import json
 import time
 import socket
-from app import CameraOakD
+from CameraOakD import CameraOakD
 
 import depthai as dai
-pipeline = dai.Pipeline()
-camRgb = pipeline.create(dai.node.ColorCamera)
-camRgb.setPreviewSize(640, 480)
 
 model_path = 'weights2/best.pt'
 model = YOLO(model_path)
@@ -88,26 +85,42 @@ def send_to_api(detected_object):
     except Exception as e:
         print("Error sending to API:", e)
 
-cap = cv2.VideoCapture(1)
-if not cap.isOpened():
-    print("Webcam Error")
-    exit
-
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Frame Read Error")
+def webcam():
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Webcam Error")
         exit
 
-    annotated_frame = detect_and_annotate2(model, frame.copy())
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Frame Read Error")
+            exit
 
-    cv2.imshow("Frame: ", annotated_frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        annotated_frame = detect_and_annotate2(model, frame.copy())
 
-    time.sleep(10)
+        cv2.imshow("Frame: ", annotated_frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-cap.release()
-cv2.destroyAllWindows()
+        time.sleep(10)
 
-results = model(frame)
+    cap.release()
+    cv2.destroyAllWindows()
+
+    results = model(frame)
+
+def oakDCam():
+    camera = CameraOakD()
+    with dai.Device(camera.pipeline) as device:
+        q = device.getOutputQueue(name="video", maxSize=1, blocking=True)
+        
+        while True:
+            frame = q.get().getCvFrame()
+            annotated_frame = detect_and_annotate2(model, frame.copy())
+
+            time.sleep(5)
+
+
+#webcam()
+oakDCam()
