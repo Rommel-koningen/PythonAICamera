@@ -1,12 +1,20 @@
+import depthai as dai
 import cv2
-import ultralytics
 
-def detect_and_annotate(model, frame):
-    results = model.predict(frame, conf=0.6)
-    for result in results:
-        for box in result.boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            label = f"{model.names[int(box.cls[0])]}"
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-    return frame
+class CameraOakD:
+    def __init__(self):
+        self.pipeline = dai.Pipeline()
+        cam = self.pipeline.createColorCamera()
+        cam.setPreviewSize(640, 480)
+        cam.setInterleaved(False)
+        self.xout = self.pipeline.createXLinkOut()
+        self.xout.setStreamName("video")
+        cam.preview.link(self.xout.input)
+
+    def capture_image(self, save_path="capture.jpg"):
+        with dai.Device(self.pipeline) as device:
+            q = device.getOutputQueue(name="video", maxSize=1, blocking=True)
+            frame = q.get().getCvFrame()
+            cv2.imwrite(save_path, frame)
+            print(f"Frame opgeslagen als {save_path}")
+            return save_path

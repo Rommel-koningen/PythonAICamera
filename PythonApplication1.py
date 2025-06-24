@@ -6,6 +6,8 @@ from ultralytics import YOLO
 import requests
 import json
 import time
+import socket
+from app import CameraOakD
 
 import depthai as dai
 pipeline = dai.Pipeline()
@@ -14,6 +16,8 @@ camRgb.setPreviewSize(640, 480)
 
 model_path = 'weights2/best.pt'
 model = YOLO(model_path)
+
+
 
 trashTypes = ['biodegradable', 'cardboard', 'glass', 'metal', 'paper', 'plastic']
 testingSending = True
@@ -28,7 +32,7 @@ def detect_and_annotate2(model, frame):
         if testingSending:
             all_trash.append({
                 "afval_Id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                "afval_Type": "TestBigMoment",
+                "afval_Type": "Test",
                 "confidence": 0
             })
 
@@ -65,7 +69,7 @@ def detect_and_annotate2(model, frame):
                 "afvalData": all_trash
             }
 
-            send_to_api(data_to_send)
+            #send_to_api(data_to_send)
 
             print(data_to_send)
 
@@ -84,7 +88,7 @@ def send_to_api(detected_object):
     except Exception as e:
         print("Error sending to API:", e)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     print("Webcam Error")
     exit
