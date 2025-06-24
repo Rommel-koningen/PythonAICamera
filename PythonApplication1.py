@@ -11,7 +11,7 @@ from CameraOakD import CameraOakD
 
 import depthai as dai
 
-model_path = 'weights2/best.pt'
+model_path = 'weightsImproved/best.pt'
 model = YOLO(model_path)
 
 
