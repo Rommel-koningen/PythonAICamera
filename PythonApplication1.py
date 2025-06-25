@@ -11,16 +11,15 @@ from CameraOakD import CameraOakD
 
 import depthai as dai
 
-model_path = 'weightsImproved/best.pt'
+model_path = 'weightsFinalest/best.pt'
 model = YOLO(model_path)
 
 
-
 trashTypes = ['biodegradable', 'cardboard', 'glass', 'metal', 'paper', 'plastic']
-testingSending = True
+testingSending = False
 
 def detect_and_annotate2(model, frame):
-    results = model.predict(frame, conf=0.6)
+    results = model.predict(frame, conf=0.2)
     
     if results != NULL:
 
@@ -66,14 +65,15 @@ def detect_and_annotate2(model, frame):
                 "afvalData": all_trash
             }
 
-            #send_to_api(data_to_send)
+            send_to_api(data_to_send)
 
             print(data_to_send)
 
     return frame
 
 def send_to_api(detected_object):
-    url = "https://rommelkoningencontainer--rommelkoningencontainer.mangopebble-9c8f37e9.northeurope.azurecontainerapps.io/TrashdataSensoring"
+    #url = "https://rommelkoningencontainer--rommelkoningencontainer.mangopebble-9c8f37e9.northeurope.azurecontainerapps.io/TrashdataSensoring"
+    url = "https://rommelkoningencontainer.mangopebble-9c8f37e9.northeurope.azurecontainerapps.io/TrashdataSensoring"
     headers = {"Api-Key-Name": "G3vVhpsno58iXRV5pmtZKwhQqd160jSietseiseenlandverraderPlKI0o3v07lAKyX9tp8BqtoxVgBEkUrGWxvrrtMdYRcbECin45227w7XU82PfyuFjkGW13MGxkvKJLZZ9YEvFzBGRtsGXpIkyvxzWSWPPZXUS7orI73OIHN8NszwuZqS25siCTYl6XVpgAKGnta4LgOTwC9jSQOHpy8PU9dNNQ", "Content-Type": "application/json"}
 
     try:
